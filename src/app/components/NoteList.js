@@ -48,7 +48,38 @@ const NoteList = ({ notes, setNotes, onDelete }) => {
         setNewDescription('');
         setNewImportant(false);
     };
-
+    const getAITitle = async (e) => {
+        e.preventDefault();
+        if (newDescription ==='') {
+            return
+        }
+        
+        const prompt = newDescription
+        const response = await fetch("/api/addaititle", {
+            method: "POST",
+            body: JSON.stringify({ prompt }),
+        });
+        const result = await response.json()
+        console.log(result)
+        // const result =JSON.parse(response).result;
+        setNewTitle(result)
+    }
+    const refineContent = async (e) => {
+        e.preventDefault();
+        if (newDescription === '') {
+            return
+        }
+       
+        const prompt = newDescription
+        const response = await fetch("/api/refine", {
+            method: "POST",
+            body: JSON.stringify({ prompt }),
+        })
+        const result = await response.json()
+        console.log(result)
+        // const result = JSON.parse(response).result;
+        setNewDescription(result)
+    }
     return (
         <div className='container'>
             <div className="row mb-3">
@@ -71,8 +102,8 @@ const NoteList = ({ notes, setNotes, onDelete }) => {
                     />
                 </div>
             </div>
-            <div className="row mb-3">
-                <div className="col">
+            <div className="grid grid-cols-2 grid-flow-row mb-3">
+                <div className="col-span-1">
                     <div className="form-check">
                         <input
                             type="checkbox"
@@ -86,10 +117,10 @@ const NoteList = ({ notes, setNotes, onDelete }) => {
                         </label>
                     </div>
                 </div>
-                <div className="col">
+                <div className="col-span-1 justify-content-end items-center">
                     {editingNoteId ? (
                         <button
-                            className="btn btn-success"
+                            className="btn btn-success m-2"
                             onClick={() => handleUpdateNote(
                                 editingNoteId,
                                 newTitle,
@@ -104,6 +135,11 @@ const NoteList = ({ notes, setNotes, onDelete }) => {
                             Add Note
                         </button>
                     )}
+                    <button className="btn btn-primary m-2" onClick={(e) => {
+                        refineContent(e)
+                    }}>Refine Content</button>
+
+                    <button className="btn btn-primary border-t-indigo-300 m-2 " onClick={(e) => { getAITitle(e) }}> Add AI Title</button>
                 </div>
             </div>
             <div className="row">
